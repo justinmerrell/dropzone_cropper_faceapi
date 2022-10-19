@@ -1,0 +1,123 @@
+<head>
+    <!-- boostrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+    <!-- dropzone.dev -->
+    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+    <!-- cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css"
+        type="text/css" />
+
+    <!-- faceapi -->
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/build/commonjs/index.min.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/image_pos.css" type="text/css" />
+</head>
+
+<body>
+
+    <!-- Two column page with an image preview on the left and an upload box on the right  -->
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Book Preview</h5>
+
+                        <!-- Preview Example Book -->
+                        <div class="combined_images">
+                            <img id="bookPreview" src="/example_book.png" alt="preview" style="max-width: 100%;" />
+                            <div class="cropContainer">
+                                <img id="placeholder" src="/placeholder.jpg" alt="placeholder" style="width: 100%;" />
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <form action="/file-upload" class="dropzone" id="my-Element"></form>
+
+                        <img id="preview" style="max-width: 100%;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+
+        Dropzone.options.myElement = {
+            // Note: using "function()" here to bind `this` to
+            // the Dropzone instance.
+            init: function () {
+                this.on("addedfile", file => {
+                    console.log("A file has been added");
+
+                    const img_preview = document.getElementById('preview');
+                    img_preview.src = URL.createObjectURL(file);
+                    img_preview.onload = function () {
+                        URL.revokeObjectURL(img_preview.src) // free memory
+                    }
+
+                    document.getElementById('my-Element').style.display = 'none';
+
+                    // Replace placeholder with the cropped image preview
+                    const placeholder = document.getElementById('placeholder');
+
+
+                    placeholder.src = img_preview.src;
+
+                    // START | Cropper
+                    const image = document.getElementById('preview');
+                    const cropper = new Cropper(image, {
+                        aspectRatio: 1 / 1,
+                        crop(event) {
+                            console.log(event.detail.x);
+                            console.log(event.detail.y);
+                            console.log(event.detail.width);
+                            console.log(event.detail.height);
+                            console.log(event.detail.rotate);
+                            console.log(event.detail.scaleX);
+                            console.log(event.detail.scaleY);
+
+
+
+                            // Crop the image to the correct size                            
+                            placeholder.style.width = (img_preview.width / (event.detail.width / 150)) + 'px';
+                            placeholder.style.height = (img_preview.height / (event.detail.height / 150)) + 'px';
+
+                            // placeholder.style.left = event.detail.x + 'px';
+                            // placeholder.style.top = event.detail.y + 'px';
+                            placeholder.style.marginLeft = -event.detail.x / (event.detail.width / 150) + 'px';
+                            placeholder.style.marginTop = -event.detail.y / (event.detail.width / 150) + 'px';
+                        },
+                    });
+                    // END | Cropper
+                });
+            }
+        };       
+    </script>
+
+
+</body>

@@ -1,0 +1,18 @@
+.combined_images{
+    position: relative;
+    top: 0px;
+    left: 0px;
+
+    height: 550px;
+    width: 550px;
+}
+
+.cropContainer{
+    position: absolute;
+    top: 250px;
+    left:70px;
+
+    height: 150px;
+    width: 150px;
+    overflow: hidden;
+}
